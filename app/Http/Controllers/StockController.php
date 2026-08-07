@@ -43,10 +43,14 @@ class StockController extends Controller
     public function show(Stock $stock, Request $request): Response
     {
         $range = (string) $request->query('range', '1y');
+        $symbol = $this->market->symbol($stock);
 
         return Inertia::render('stocks/Show', [
             'stock' => $stock,
-            'quote' => $this->market->chart($stock, $range),
+            'quote' => $this->market->chart($symbol, $range),
+            'fundamentals' => $this->market->fundamentals($symbol),
+            'news' => $this->market->news($symbol),
+            'actions' => $this->market->corporateActions($symbol),
             'range' => $range,
             'isWatched' => $request->user()->watchedStocks()->whereKey($stock->id)->exists(),
         ]);

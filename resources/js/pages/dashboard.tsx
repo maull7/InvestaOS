@@ -20,7 +20,7 @@ export default function Dashboard() {
                         </p>
                     </div>
 
-                <StatCards />
+                    <StatCards />
                     <BalanceChart />
                     <RecentTransactions />
                 </div>

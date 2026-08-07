@@ -15,6 +15,7 @@ use App\Http\Controllers\InvestmentGoalController;
 use App\Http\Controllers\InvestmentManagerController;
 use App\Http\Controllers\InvestmentProfileController;
 use App\Http\Controllers\IpsController;
+use App\Http\Controllers\MarketDataController;
 use App\Http\Controllers\MutualFundController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\StockController;
@@ -175,6 +176,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/reksa-dana/{mutualFund:code}', [MutualFundController::class, 'show'])
         ->middleware('onboarded')
         ->name('mutual-funds.show');
+
+    Route::get('/market-data', [MarketDataController::class, 'index'])
+        ->middleware('onboarded')
+        ->name('market-data.index');
 
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 });

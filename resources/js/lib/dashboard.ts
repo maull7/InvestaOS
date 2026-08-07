@@ -22,6 +22,11 @@ export const investorNavSections: NavSection[] = [
             },
             { icon: 'file', label: 'Investment Policy', href: '/policy' },
             { icon: 'query_stats', label: 'Stocks', href: '/stocks' },
+            {
+                icon: 'public',
+                label: 'Market Data',
+                href: '/market-data',
+            },
             { icon: 'payments', label: 'Bonds', href: '/bonds' },
             {
                 icon: 'group',

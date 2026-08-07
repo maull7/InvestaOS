@@ -21,9 +21,24 @@ type Stock = {
     website: string | null;
 };
 
+type NewsItem = {
+    title: string;
+    publisher: string | null;
+    link: string;
+    publishedAt: number | null;
+};
+
+type CorporateActions = {
+    dividends: { date: number; amount: number }[];
+    splits: { date: number; numerator: number; denominator: number }[];
+};
+
 type Props = {
     stock: Stock;
     quote: StockQuote | null;
+    fundamentals: Record<string, number>;
+    news: NewsItem[];
+    actions: CorporateActions;
     range: string;
     isWatched: boolean;
 };
@@ -47,9 +62,46 @@ function MetadataRow({
     );
 }
 
-export default function StockShow({ stock, quote, isWatched }: Props) {
+function fmtFat(v: number | undefined | null): string | null {
+    if (v == null) {
+return null;
+}
+
+    return v.toFixed(2);
+}
+
+function fmtPct(v: number | null): string | null {
+    if (v == null) {
+return null;
+}
+
+    return `${(v * 100).toFixed(2)}%`;
+}
+
+function fmtMoney(v: number | null, currency: string): string | null {
+    if (v == null) {
+return null;
+}
+
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    }).format(v);
+}
+
+export default function StockShow({
+    stock,
+    quote,
+    fundamentals,
+    news,
+    actions,
+    isWatched,
+}: Props) {
     const [compareOpen, setCompareOpen] = useState(false);
     const [compareCodes, setCompareCodes] = useState<string[]>([]);
+    const currency = quote?.currency ?? 'IDR';
 
     function addCompare(code: string) {
         if (!compareCodes.includes(code)) {
@@ -180,6 +232,173 @@ export default function StockShow({ stock, quote, isWatched }: Props) {
                             </div>
                         </Card>
                     </div>
+
+                    {Object.keys(fundamentals).length > 0 && (
+                        <Card className="p-6">
+                            <h4 className="mb-3 font-headline text-headline-md font-semibold text-dashboard-on-surface dark:text-dashboard-inverse-on-surface">
+                                Fundamental
+                            </h4>
+                            <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
+                                <MetadataRow
+                                    label="P/E (trailing)"
+                                    value={fmtFat(fundamentals.trailingPE)}
+                                />
+                                <MetadataRow
+                                    label="P/E (forward)"
+                                    value={fmtFat(fundamentals.forwardPE)}
+                                />
+                                <MetadataRow
+                                    label="EPS"
+                                    value={fmtMoney(fundamentals.eps, currency)}
+                                />
+                                <MetadataRow
+                                    label="Dividend yield"
+                                    value={
+                                        fundamentals.dividendYieldPercent != null
+                                            ? `${fundamentals.dividendYieldPercent.toFixed(2)}%`
+                                            : null
+                                    }
+                                />
+                                <MetadataRow
+                                    label="Dividend"
+                                    value={fmtMoney(
+                                        fundamentals.dividendRate,
+                                        currency,
+                                    )}
+                                />
+                                <MetadataRow
+                                    label="Payout ratio"
+                                    value={fmtPct(fundamentals.payoutRatio)}
+                                />
+                                <MetadataRow
+                                    label="Book value"
+                                    value={fmtMoney(
+                                        fundamentals.bookValue,
+                                        currency,
+                                    )}
+                                />
+                                <MetadataRow
+                                    label="Price/book"
+                                    value={fmtFat(fundamentals.priceToBook)}
+                                />
+                                <MetadataRow
+                                    label="Beta"
+                                    value={fmtFat(fundamentals.beta)}
+                                />
+                                <MetadataRow
+                                    label="ROE"
+                                    value={fmtPct(fundamentals.returnOnEquity)}
+                                />
+                                <MetadataRow
+                                    label="Profit margin"
+                                    value={fmtPct(fundamentals.profitMargins)}
+                                />
+                                <MetadataRow
+                                    label="Revenue"
+                                    value={fmtMoney(
+                                        fundamentals.revenue,
+                                        currency,
+                                    )}
+                                />
+                            </div>
+                        </Card>
+                    )}
+
+                    {news.length > 0 && (
+                        <Card className="p-6">
+                            <h4 className="mb-3 font-headline text-headline-md font-semibold text-dashboard-on-surface dark:text-dashboard-inverse-on-surface">
+                                Berita
+                            </h4>
+                            <ul className="space-y-3">
+                                {news.map((n) => (
+                                    <li key={n.link}>
+                                        <a
+                                            href={n.link}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="font-body text-body-md font-semibold text-dashboard-on-surface hover:text-dashboard-primary dark:text-dashboard-inverse-on-surface"
+                                        >
+                                            {n.title}
+                                        </a>
+                                        <p className="font-body text-body-sm text-dashboard-on-surface-variant dark:text-dashboard-surface-variant">
+                                            {n.publisher ?? '—'}
+                                            {n.publishedAt
+                                                ? ` · ${new Date(n.publishedAt * 1000).toLocaleDateString('id-ID', {
+                                                      year: 'numeric',
+                                                      month: 'short',
+                                                      day: 'numeric',
+                                                  })}`
+                                                : ''}
+                                        </p>
+                                    </li>
+                                ))}
+                            </ul>
+                        </Card>
+                    )}
+
+                    {actions.dividends.length > 0 && (
+                        <Card className="p-6">
+                            <h4 className="mb-3 font-headline text-headline-md font-semibold text-dashboard-on-surface dark:text-dashboard-inverse-on-surface">
+                                Riwayat Dividen
+                            </h4>
+                            <ul className="max-h-72 divide-y divide-dashboard-outline-variant/10 overflow-y-auto pr-1 dark:divide-white/5">
+                                {actions.dividends
+                                    .slice()
+                                    .reverse()
+                                    .map((d) => (
+                                        <li
+                                            key={d.date}
+                                            className="flex items-center justify-between gap-4 py-2"
+                                        >
+                                            <span className="font-body text-body-sm text-dashboard-on-surface-variant dark:text-dashboard-surface-variant">
+                                                {new Date(
+                                                    d.date * 1000,
+                                                ).toLocaleDateString('id-ID', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                })}
+                                            </span>
+                                            <span className="font-body text-body-sm font-medium text-dashboard-on-surface dark:text-dashboard-inverse-on-surface">
+                                                {fmtMoney(d.amount, currency)}
+                                            </span>
+                                        </li>
+                                    ))}
+                            </ul>
+                        </Card>
+                    )}
+
+                    {actions.splits.length > 0 && (
+                        <Card className="p-6">
+                            <h4 className="mb-3 font-headline text-headline-md font-semibold text-dashboard-on-surface dark:text-dashboard-inverse-on-surface">
+                                Riwayat Stock Split
+                            </h4>
+                            <ul className="divide-y divide-dashboard-outline-variant/10 dark:divide-white/5">
+                                {actions.splits
+                                    .slice()
+                                    .reverse()
+                                    .map((s) => (
+                                        <li
+                                            key={s.date}
+                                            className="flex items-center justify-between gap-4 py-2"
+                                        >
+                                            <span className="font-body text-body-sm text-dashboard-on-surface-variant dark:text-dashboard-surface-variant">
+                                                {new Date(
+                                                    s.date * 1000,
+                                                ).toLocaleDateString('id-ID', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                })}
+                                            </span>
+                                            <span className="font-body text-body-sm font-medium text-dashboard-on-surface dark:text-dashboard-inverse-on-surface">
+                                                {s.numerator}:{s.denominator}
+                                            </span>
+                                        </li>
+                                    ))}
+                            </ul>
+                        </Card>
+                    )}
                 </div>
             </DashboardLayout>
 

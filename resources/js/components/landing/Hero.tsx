@@ -109,9 +109,9 @@ export default function Hero() {
 
                         <Reveal delay={100}>
                             <h1 className="font-headline text-display-lg-mobile text-landing-on-surface md:text-display-lg dark:text-landing-inverse-on-surface">
-                                Modern{' '}
+                                InvestaOS{' '}
                                 <span className="text-gradient font-light italic">
-                                    payments
+                                    Analitics Stock Platform
                                 </span>
                                 <br />
                                 for markets.
