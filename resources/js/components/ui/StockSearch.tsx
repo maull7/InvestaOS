@@ -11,16 +11,27 @@ type StockSearchProps = {
     disabled?: boolean;
 };
 
-export default function StockSearch({ onSelect, exclude = [], placeholder = 'Cari kode atau nama saham…', disabled }: StockSearchProps) {
+const NO_EXCLUDE: string[] = [];
+
+export default function StockSearch({
+    onSelect,
+    exclude = NO_EXCLUDE,
+    placeholder = 'Cari kode atau nama saham…',
+    disabled,
+}: StockSearchProps) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<StockHit[]>([]);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const controller = useRef<AbortController | null>(null);
 
     useEffect(() => {
         if (timer.current) {
             clearTimeout(timer.current);
+        }
+        if (controller.current) {
+            controller.current.abort();
         }
 
         const q = query.trim();
@@ -31,8 +42,12 @@ export default function StockSearch({ onSelect, exclude = [], placeholder = 'Car
 
         timer.current = setTimeout(async () => {
             setLoading(true);
+            controller.current = new AbortController();
             try {
-                const res = await fetch(`/stocks/search?q=${encodeURIComponent(q)}`);
+                const res = await fetch(
+                    `/stocks/search?q=${encodeURIComponent(q)}`,
+                    { signal: controller.current.signal },
+                );
                 const list: StockHit[] = (await res.json()) ?? [];
                 setResults(list.filter((h) => !exclude.includes(h.code)));
                 setOpen(true);
@@ -41,7 +56,7 @@ export default function StockSearch({ onSelect, exclude = [], placeholder = 'Car
             } finally {
                 setLoading(false);
             }
-        }, 300); // debounce
+        }, 300); // ponytail: debounce; AbortController kills stale fetches so an old reply can't close an open dropdown
 
         return () => {
             if (timer.current) {

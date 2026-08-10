@@ -5,6 +5,8 @@ import type { StockQuote } from '@/components/chart/StockChart';
 import BalanceChart from '@/components/dashboard/BalanceChart';
 import Card from '@/components/dashboard/Card';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import LatestResearchCard from '@/components/dashboard/LatestResearch';
+import type { LatestResearchItem } from '@/components/dashboard/LatestResearch';
 import Button from '@/components/ui/Button';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import GoalModal from '@/components/ui/GoalModal';
@@ -55,6 +57,7 @@ type Props = {
         };
         calc: BondCalc;
     }[];
+    latestResearch: LatestResearchItem[];
 };
 
 const priorityTone: Record<Goal['priority'], string> = {
@@ -79,6 +82,7 @@ export default function InvestorDashboard({
     allocations,
     watchlist,
     bondWatchlist,
+    latestResearch,
 }: Props) {
     const toast = useToast();
     const [goalOpen, setGoalOpen] = useState(false);
@@ -196,6 +200,8 @@ export default function InvestorDashboard({
                     </div>
 
                     <BalanceChart />
+
+                    <LatestResearchCard latestResearch={latestResearch} />
 
                     <Card className="overflow-hidden">
                         <div className="flex items-center justify-between border-b border-dashboard-outline-variant/20 px-6 py-4 dark:border-white/10">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bond;
+use App\Models\Research;
 use App\Models\Stock;
 use App\Services\BondService;
 use App\Services\GoalDetectionService;
@@ -16,8 +17,14 @@ class DashboardController extends Controller
 {
     public function index(Request $request): Response
     {
+        $latestResearch = Research::with('createdBy:id,name')
+            ->where('status', 'published')
+            ->latest('published_at')
+            ->limit(3)
+            ->get();
+
         if ($request->user()->isAdmin()) {
-            return Inertia::render('dashboard');
+            return Inertia::render('dashboard', ['latestResearch' => $latestResearch]);
         }
 
         $profile = $request->user()->investmentProfile;
@@ -56,6 +63,7 @@ class DashboardController extends Controller
             'allocations' => $suitability['allocations'],
             'watchlist' => $watchlist,
             'bondWatchlist' => $bondWatchlist,
+            'latestResearch' => $latestResearch,
         ]);
     }
 

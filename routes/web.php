@@ -18,6 +18,7 @@ use App\Http\Controllers\IpsController;
 use App\Http\Controllers\MarketDataController;
 use App\Http\Controllers\MutualFundController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\StockController;
 use Illuminate\Support\Facades\Route;
 
@@ -180,6 +181,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/market-data', [MarketDataController::class, 'index'])
         ->middleware('onboarded')
         ->name('market-data.index');
+
+    Route::get('/research', [ResearchController::class, 'index'])
+        ->middleware('onboarded')
+        ->name('research.index');
+
+    Route::get('/research/create', [ResearchController::class, 'create'])
+        ->middleware('onboarded')
+        ->name('research.create');
+
+    Route::post('/research/generate', [ResearchController::class, 'generate'])
+        ->middleware(['onboarded', 'throttle:research-generate'])
+        ->name('research.generate');
+
+    Route::get('/research/{research}', [ResearchController::class, 'show'])
+        ->middleware('onboarded')
+        ->name('research.show');
 
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 });

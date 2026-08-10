@@ -40,7 +40,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'flash' => fn () => session('imported') ? ['imported' => session('imported')] : null,
+            'flash' => fn () => session('flash') ?? (session('imported') ? ['imported' => session('imported')] : null),
             'auth' => [
                 'user' => $user,
                 'role' => $user?->role,

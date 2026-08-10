@@ -2,10 +2,16 @@ import { Head } from '@inertiajs/react';
 
 import BalanceChart from '@/components/dashboard/BalanceChart';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import LatestResearchCard from '@/components/dashboard/LatestResearch';
+import type { LatestResearchItem } from '@/components/dashboard/LatestResearch';
 import RecentTransactions from '@/components/dashboard/RecentTransactions';
 import StatCards from '@/components/dashboard/StatCards';
 
-export default function Dashboard() {
+type Props = {
+    latestResearch: LatestResearchItem[];
+};
+
+export default function Dashboard({ latestResearch }: Props) {
     return (
         <>
             <Head title="Dashboard" />
@@ -22,6 +28,7 @@ export default function Dashboard() {
 
                     <StatCards />
                     <BalanceChart />
+                    <LatestResearchCard latestResearch={latestResearch} />
                     <RecentTransactions />
                 </div>
             </DashboardLayout>

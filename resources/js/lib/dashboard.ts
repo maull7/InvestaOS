@@ -21,6 +21,11 @@ export const investorNavSections: NavSection[] = [
                 href: '/planning',
             },
             { icon: 'file', label: 'Investment Policy', href: '/policy' },
+            {
+                icon: 'description',
+                label: 'Research Center',
+                href: '/research',
+            },
             { icon: 'query_stats', label: 'Stocks', href: '/stocks' },
             {
                 icon: 'public',
@@ -42,7 +47,14 @@ export const investorNavSections: NavSection[] = [
 export const adminNavSections: NavSection[] = [
     {
         label: 'Menu',
-        items: [{ icon: 'dashboard', label: 'Dashboard', href: '/dashboard' }],
+        items: [
+            { icon: 'dashboard', label: 'Dashboard', href: '/dashboard' },
+            {
+                icon: 'description',
+                label: 'Research Center',
+                href: '/research',
+            },
+        ],
     },
     {
         label: 'Management',

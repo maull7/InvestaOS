@@ -2,10 +2,12 @@ import { Head, Link } from '@inertiajs/react';
 
 import Card from '@/components/dashboard/Card';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import AiResearchButton from '@/components/ui/AiResearchButton';
 import { fundTypeLabel, riskLabel, riskTone } from '@/lib/investment';
 import { cn } from '@/lib/utils';
 
 type Fund = {
+    id: number;
     code: string | null;
     name: string;
     fund_type: string;
@@ -59,6 +61,7 @@ export default function FundShow({ fund }: Props) {
                         >
                             Risiko: {riskLabel(fund.risk_level)}
                         </span>
+                        <AiResearchButton assetType="fund" assetId={fund.id} />
                     </div>
 
                     <div className="grid gap-4 lg:grid-cols-3">

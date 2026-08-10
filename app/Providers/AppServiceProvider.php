@@ -4,12 +4,18 @@ namespace App\Providers;
 
 use App\Ai\Gateway\NineRouterGateway;
 use App\Contracts\IpsWriter;
+use App\Services\BondService;
+use App\Services\ResearchDataService;
+use App\Services\ResearchGenerationService;
 use App\Services\Writers\AiWriter;
 use App\Services\Writers\RuleBasedWriter;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Ai\AiManager;
@@ -31,6 +37,14 @@ class AppServiceProvider extends ServiceProvider
 
             return $ruleBased;
         });
+
+        $this->app->singleton(ResearchGenerationService::class, function ($app) {
+            return new ResearchGenerationService(
+                $app->make(ResearchDataService::class),
+                $app->make(BondService::class),
+                config('ai')
+            );
+        });
     }
 
     /**
@@ -44,6 +58,10 @@ class AppServiceProvider extends ServiceProvider
             $provider = new OpenAiCompatibleProvider($config, $app->make(Dispatcher::class));
 
             return $provider->useTextGateway(new NineRouterGateway($app->make(Dispatcher::class)));
+        });
+
+        RateLimiter::for('research-generate', function (Request $request) {
+            return Limit::perMinute(3)->by($request->user()?->id ?? $request->ip());
         });
     }
 

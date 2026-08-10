@@ -5,6 +5,7 @@ import StockChart from '@/components/chart/StockChart';
 import type { StockQuote } from '@/components/chart/StockChart';
 import Card from '@/components/dashboard/Card';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import AiResearchButton from '@/components/ui/AiResearchButton';
 import Button from '@/components/ui/Button';
 import Icon from '@/components/ui/Icon';
 import Modal from '@/components/ui/Modal';
@@ -12,6 +13,7 @@ import StockSearch from '@/components/ui/StockSearch';
 import { cn } from '@/lib/utils';
 
 type Stock = {
+    id: number;
     code: string;
     name: string;
     sector: string | null;
@@ -64,24 +66,24 @@ function MetadataRow({
 
 function fmtFat(v: number | undefined | null): string | null {
     if (v == null) {
-return null;
-}
+        return null;
+    }
 
     return v.toFixed(2);
 }
 
 function fmtPct(v: number | null): string | null {
     if (v == null) {
-return null;
-}
+        return null;
+    }
 
     return `${(v * 100).toFixed(2)}%`;
 }
 
 function fmtMoney(v: number | null, currency: string): string | null {
     if (v == null) {
-return null;
-}
+        return null;
+    }
 
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -141,6 +143,10 @@ export default function StockShow({
                             >
                                 PDF
                             </a>
+                            <AiResearchButton
+                                assetType="stock"
+                                assetId={stock.id}
+                            />
                             <button
                                 type="button"
                                 onClick={() =>
@@ -254,7 +260,8 @@ export default function StockShow({
                                 <MetadataRow
                                     label="Dividend yield"
                                     value={
-                                        fundamentals.dividendYieldPercent != null
+                                        fundamentals.dividendYieldPercent !=
+                                        null
                                             ? `${fundamentals.dividendYieldPercent.toFixed(2)}%`
                                             : null
                                     }
@@ -323,11 +330,16 @@ export default function StockShow({
                                         <p className="font-body text-body-sm text-dashboard-on-surface-variant dark:text-dashboard-surface-variant">
                                             {n.publisher ?? '—'}
                                             {n.publishedAt
-                                                ? ` · ${new Date(n.publishedAt * 1000).toLocaleDateString('id-ID', {
-                                                      year: 'numeric',
-                                                      month: 'short',
-                                                      day: 'numeric',
-                                                  })}`
+                                                ? ` · ${new Date(
+                                                      n.publishedAt * 1000,
+                                                  ).toLocaleDateString(
+                                                      'id-ID',
+                                                      {
+                                                          year: 'numeric',
+                                                          month: 'short',
+                                                          day: 'numeric',
+                                                      },
+                                                  )}`
                                                 : ''}
                                         </p>
                                     </li>

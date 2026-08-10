@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react';
 
 import Card from '@/components/dashboard/Card';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import AiResearchButton from '@/components/ui/AiResearchButton';
 import {
     bondTypeLabel,
     fmtMoney,
@@ -13,6 +14,7 @@ import type { BondCalc } from '@/lib/bonds';
 import { cn } from '@/lib/utils';
 
 type Bond = {
+    id: number;
     code: string;
     name: string;
     type: string;
@@ -99,6 +101,7 @@ export default function BondShow({ bond, calc, isWatched }: Props) {
                         >
                             {isWatched ? '★ Dipantau' : '☆ Pantau'}
                         </button>
+                        <AiResearchButton assetType="bond" assetId={bond.id} />
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">

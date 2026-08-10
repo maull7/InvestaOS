@@ -28,7 +28,7 @@ function fmtPrice(p: number): string {
 function SectionCard({ title, rows }: { title: string; rows: QuoteRow[] }) {
     return (
         <Card className="p-6">
-            <h4 className="mb-4 font-headline text-headline-sm font-semibold text-dashboard-on-surface dark:text-dashboard-inverse-on-surface">
+            <h4 className="text-headline-sm mb-4 font-headline font-semibold text-dashboard-on-surface dark:text-dashboard-inverse-on-surface">
                 {title}
             </h4>
             {rows.length === 0 ? (
@@ -96,7 +96,10 @@ export default function MarketDataIndex({ rates, indices }: Props) {
                     </div>
 
                     <div className="grid gap-4 lg:grid-cols-2">
-                        <SectionCard title="Kurs Mata Uang (IDR)" rows={rates} />
+                        <SectionCard
+                            title="Kurs Mata Uang (IDR)"
+                            rows={rates}
+                        />
                         <SectionCard title="Indeks Pasar" rows={indices} />
                     </div>
                 </div>
